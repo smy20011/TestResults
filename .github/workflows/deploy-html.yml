@@ -39,8 +39,12 @@ jobs:
       - name: Run uv commands and build HTML files
         env:
           PATIENT_INFO: ${{ secrets.PATIENT_INFO }}
+          STATICRYPT_PASSWORD: ${{ secrets.PASSWORD }}
         run: |
           uv run main.py index.html
+          yes | npx staticrypt index.html
+          cp encrypted/index.html .
+          rm -rf encrypted
 
       - uses: mikeal/publish-to-github-action@master
         env:
