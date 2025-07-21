@@ -17,9 +17,7 @@ jobs:
     runs-on: ubuntu-latest # Use a Linux runner
 
     # Configure the deployment environment for GitHub Pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # The URL where the site will be deployed
+    environment: build
 
     steps:
       - name: Checkout repository
