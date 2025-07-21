@@ -1,0 +1,49 @@
+name: Deploy HTML with uv
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch (change to 'master' or other if needed)
+  workflow_dispatch: # Allows manual triggering of the workflow from the GitHub UI
+
+# Grant GITHUB_TOKEN the necessary permissions to deploy to GitHub Pages
+permissions:
+  contents: write # Required to push to the gh-pages branch (if using that strategy)
+  pages: write # Required to deploy to GitHub Pages
+  id-token: write # Required for OIDC authentication with GitHub Pages
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # Use a Linux runner
+
+    # Configure the deployment environment for GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # The URL where the site will be deployed
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Checks out your repository code
+
+      - name: Set up Python
+        uses: actions/setup-python@v5 # Sets up a Python environment
+        with:
+          python-version: '3.10' # Specify your desired Python version (e.g., '3.9', '3.11')
+
+      - name: Set up nodejs
+        uses: actions/setup-node@v4
+
+      - name: Install uv
+        run: |
+          # Install uv using pip. uv is a fast Python package installer and resolver.
+          pip install uv
+
+      - name: Run uv commands and build HTML files
+        run: |
+          uv run main.py index.html
+
+      - uses: mikeal/publish-to-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub sets this for you
+          BRANCH_NAME: 'main'
+
